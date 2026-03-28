@@ -195,11 +195,9 @@
       <div class="step">
         <div class="step-label">Step 1 — Pay $0.02 on Venmo</div>
         <a id="venmo-link"
-           href="https://account.venmo.com/pay?recipients=Amnon-Karni&amount=0.02&note=My+2+Cents"
-           target="_blank"
-           rel="noopener noreferrer"
+           href="#"
            class="venmo-btn"
-           onclick="handleVenmoClick()">
+           onclick="openVenmo(); return false;">
           Pay $0.02 on Venmo →
         </a>
       </div>
@@ -267,7 +265,26 @@
     const db = firebase.firestore();
     const COLLECTION = "opinions";
 
-    // --- Venmo click: honor system unlock ---
+    // --- Venmo deep link + honor system unlock ---
+    const VENMO_WEB = 'https://account.venmo.com/pay?recipients=Amnon-Karni&amount=0.02&note=My+2+Cents';
+    const VENMO_APP = 'venmo://paycharge?txn=pay&recipients=Amnon-Karni&amount=0.02&note=My+2+Cents';
+
+    function openVenmo() {
+      handleVenmoClick();
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
+        window.open(VENMO_WEB, '_blank');
+        return;
+      }
+      // Try native app; fall back to web only if app didn't open
+      window.location.href = VENMO_APP;
+      setTimeout(() => {
+        if (!document.hidden) {
+          window.open(VENMO_WEB, '_blank');
+        }
+      }, 1500);
+    }
+
     let venmoClicked = false;
 
     function handleVenmoClick() {
